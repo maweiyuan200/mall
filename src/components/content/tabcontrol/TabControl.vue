@@ -29,6 +29,8 @@ export default {
   methods: {
     itemClick(index) {
       this.currentIndex = index
+      //把点击了哪个元素传到home父组件中
+      this.$emit('tabClick', index)
     }
   }
 }
@@ -41,6 +43,7 @@ export default {
     height: 44px;
     line-height: 44px;
     font-size: 15px;
+    background-color: #fff;
   }
   .tab-control-item {
     flex: 1;

@@ -53,7 +53,7 @@
     width: 24px;
     height: 24px;
     margin-top: 3px;
-    vertical-align: middle;
+    vertical-align: middle; /*把此元素放置在父元素的中部*/
     margin-bottom: 2px;
   }
   /*.active {*/
