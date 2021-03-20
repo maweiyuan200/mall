@@ -1,11 +1,20 @@
 <template>
   <div class="goods-item" @click="itemClick">
-      <img :src="goodsItem.show.img" alt="" @load="imgLoad">
-      <div class="goods-info">
-        <p>{{goodsItem.title}}</p>
-        <span class="price">{{goodsItem.price}}</span>
-        <span class="collect">{{goodsItem.cfav}}</span>
-      </div>
+    <!-- 这个组件是被home，detail两个组件复用的，由于图片数据不一样，所以这里v-if判断 -->
+    <!-- 图片链接 -->
+    <!-- img的src改成v-lazy是因为使用懒加载插件 -->
+    <img
+        v-lazy="goodsItem.show.img" alt=""
+        @load="imgLoad"
+        v-if="!isDetailMsg" />
+    <!-- detail组件的推荐商品数据 -->
+    <img v-lazy="goodsItem.image" alt="" v-else />
+    <!-- 下面文字 -->
+    <div class="context">
+      <p>{{goodsItem.title}}</p>
+      <span class="price">{{goodsItem.price}}</span>
+      <span class="cafv">{{goodsItem.cfav}}</span>
+    </div>
   </div>
 </template>
 
@@ -18,15 +27,30 @@ export default {
       default() {
         return {}
       }
+    },
+    isDetailMsg: {
+      type: Boolean
     }
   },
   methods: {
     imgLoad() {
       this.$bus.$emit('imgLoadFinish')
+
+      // 不使用混入时，进入哪个就发送给哪个组件请求刷新
+      //  if (this.$route.path.indexOf('/home')) {
+      //     this.$bus.$emit('HomeimgLoadOk');
+      //  } else if (this.$route.path.indexOf('/details')) {
+      //     this.$bus.$emit('DetailImgLoad');
+      //  }
     },
     itemClick() {
-      //拿到goodsItem里的iid传进详情页
-      this.$router.push('/detail/' + this.goodsItem.iid)
+      if (/detail/.test(this.$route.path)) {
+        //  跳转到其它路径
+        this.$toast.show(this.goodsItem.title)
+      } else {
+        //拿到goodsItem里的iid传进详情页
+        this.$router.push('/detail/' + this.goodsItem.iid)
+      }
     }
   }
 }
@@ -43,7 +67,7 @@ export default {
     height: 100%;
     border-radius: 4px;
   }
-  .goods-info {
+  .goods-item .context {
     font-size: 12px;
     position: absolute;
     bottom: 5px;
@@ -52,20 +76,20 @@ export default {
     overflow: hidden; /*当内容溢出元素框时隐藏*/
     text-align: center;
   }
-  .goods-info p {
+  .context p {
     overflow: hidden;
     text-overflow: ellipsis; /*显示省略符号来代表被修剪的文本*/
     white-space: nowrap; /*规定段落中的文本不进行换行*/
     margin-bottom: 3px;
   }
-  .goods-info .price {
+  .price {
     color: var(--color-height-text);
     margin-right: 20px;
   }
-  .goods-info .collect {
+  .cafv {
     position: relative;
   }
-  .goods-info .collect::before {
+  .cafv::before {
     content: '';
     position: absolute;
     left: -15px;

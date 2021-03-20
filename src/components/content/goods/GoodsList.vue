@@ -1,6 +1,10 @@
 <template>
   <div class="goods-list">
-    <goods-list-item v-for="item in goods" :goodsItem="item"/>
+    <goods-list-item
+        v-for="(item, index) in goods"
+        :key="index"
+        :goodsItem="item"
+        :isDetailMsg='isDetailMsg'/>
   </div>
 </template>
 
@@ -17,8 +21,12 @@ export default {
       default() {
         return {}
       }
+    },
+    isDetailMsg: {
+      type: Boolean,
+      default: false
     }
-  }
+  },
 }
 </script>
 
@@ -27,7 +35,7 @@ export default {
     display: flex;
     flex-wrap: wrap; /*根据元素宽度显示一行最多可以放下多少个元素*/
     /*align-items: center;*/
-    justify-content: space-between;
+    justify-content: space-evenly;
     padding: 3px;
   }
 </style>
