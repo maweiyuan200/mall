@@ -41,6 +41,7 @@ import HomeFeatureView from "./childComp/HomeFeatureView"
 
 import {getHomeMultidata, getHomeGoods} from "network/home"
 import {debounce} from "common/utils"
+import {MixIn, backTopMixIn} from 'common/mixin'
 
 export default {
   name: "Home",
@@ -65,10 +66,10 @@ export default {
       },
       //默认当前类型为pop
       currentType: 'pop',
-      isShowBackTop: false,
+      // isShowBackTop: false,
       tabOffsetTop: 0,
       isTabFixed: false,
-      saveY: 0
+      saveY: 0,
     }
   },
   created() {
@@ -82,19 +83,22 @@ export default {
   },
   mounted() {
     const refresh = debounce(this.$refs.scroll.refresh, 50)
-    this.$bus.$on('imgLoadFinish', () => {
-      refresh()
-    })
 
+    this.itemImgListener = () => {refresh()}
+    this.$bus.$on('imgLoadFinish', this.itemImgListener)
   },
   deactivated() {
     this.saveY = this.$refs.scroll.getY()
+
+    //取消全局事件的监听
+    this.$bus.$off('imgLoadFinish', this.itemImgListener)
   },
   activated() {
     this.$refs.scroll.scrollTo(0, this.saveY, 0)
     // 回来时最好刷新一次，不然可能出现bug
     this.$refs.scroll.refresh()
   },
+  mixins: [MixIn, backTopMixIn],
   methods: {
     /**
     **普通监听方法
@@ -115,10 +119,10 @@ export default {
       this.$refs.tabControl1.currentIndex = index
       this.$refs.tabControl2.currentIndex = index
     },
-    backClick() {
-      //拿到scroll组件里的scroll对象里的scrollTo方法(x轴， y轴， 毫秒)
-      this.$refs.scroll.scrollTo(0, -610, 500)
-    },
+    // backClick() {
+    //   //拿到scroll组件里的scroll对象里的scrollTo方法(x轴， y轴， 毫秒)
+    //   this.$refs.scroll.scrollTo(0, -610, 500)
+    // },
     contentScroll(position) {
       //判断y轴实时位置决定是否显示返回顶部按钮
       this.isShowBackTop = -(position.y) > 1000

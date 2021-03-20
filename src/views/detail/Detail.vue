@@ -8,8 +8,8 @@
     <scroll
         class="d-wrapper"
         ref="scroll"
-        @contentScroll='contentScroll'
-        :probe-type='3'>
+        @scroll="contentScroll"
+        :probe-type="3">
       <!-- 轮播图组件 -->
       <detail-swiper :top-images='topImages'></detail-swiper>
       <!-- 基本信息组件 -->
@@ -19,7 +19,7 @@
       <!-- 商品图片组件 -->
       <detail-goods-info
           :goods-info='goodsInfo'
-          @imgLoadFinish='imageLoadOk'>
+          @imageLoadOk='imageLoadOk'>
       </detail-goods-info>
       <!-- 商品尺寸大小 -->
       <detail-size
@@ -37,7 +37,7 @@
           class="goods-list"></goods-list>
     </scroll>
     <!-- .native实现监听组件内原生事件 -->
-    <back-top @click.native='backClick' v-show="isShowBackTop"></back-top>
+    <back-top @click.native="backClick" v-show="isShowBackTop"/>
     <!-- 底部工具栏 -->
     <detail-bottom-tab
         @addShopCar='addShopCar'
@@ -72,11 +72,9 @@ import GoodsList from 'components/content/goods/GoodsList'
 import DetailBottomTab from './childComp/DetailBottomTab'
 // 导入滚动模块
 import Scroll from 'components/common/scroll/Scroll'
-// 引入防抖动的封装函数 （不适用混入时，可以留，这里用的混入，所以可以删除）
-import {debounce} from 'common/utils'
 // 返回首页导航按钮
 import BackTop from 'components/content/backtop/BackTop'
-// 导入混入Minxi
+// 导入混入Mixin
 import {MixIn,backTopMixIn} from 'common/mixin'
 // 导入变量名
 import {ADDCART} from 'store/mutations-types'
@@ -112,7 +110,7 @@ export default {
       isDetailMsg: true,  //因为我们推荐数据的组件是用同一个的，所以用来区分数据
       themeTops: [],   //保存头部导航栏对应到的offsetTop值
       currentIndex: 0,   //防止滚动那里重复刷数据
-      isShowBackTop: false,  //默认设置是看不见的
+      // isShowBackTop: false,  //默认设置是看不见的
       /*
       msg: '',   //保存toast数据
       show: false  //是否显示toast
@@ -126,7 +124,7 @@ export default {
       const data = res.result;
       //  2、保存详细里面的数据
       this.topImages = data.itemInfo.topImages
-      // console.log(res)
+
 
       // 3、保存基本信息数据
       // 重点二、把这个对象new出来，同时传递参数
@@ -175,7 +173,7 @@ export default {
     }),
     imageLoadOk () {
       // 刷新
-      this.$refs.scroll.refresh();
+      this.newRefresh()
       // 获取高度，给我们头部导航栏定位锚点用，在这里监听是最好的，因为刷新完后，高度获取绝对正确
       this.themeTops.push(0);
       this.themeTops.push(this.$refs.Size.$el.offsetTop);
@@ -186,38 +184,39 @@ export default {
       // console.log(this.themeTops)
     },
     titleClick (index) { //头部导航栏
-      this.$refs.scroll.scrollTo(0,-this.themeTops[index],500)
+      this.$refs.scroll.scrollTo(0, -this.themeTops[index], 500)
     },
-    contentScroll(position) {
-      // 获取y值，为了方便我们对比。所以获取正值
-      const positionY = -position.y
-      // 保存数组长度
-      const length = this.themeTops.length - 1;
-      // 滚动，这个值与themeTops对比
-      for (let i in this.themeTops) {  //获取的i是字符串
-        // 这样子3没法获取到
-        // if (positionY > this.themeTops[i] && positionY < this.themeTops[parseInt(i)+1]) {
-        //   console.log(i)
-        // }
-        /*if (this.currentIndex != i && ((i < length -1 && positionY > this.themeTops[i] && positionY < this.themeTops[parseInt(i)+1]) ||
-            (i == length -1 && positionY > this.themeTops[i]))) {
-              this.currentIndex = i;// 防止赋值过程过于频繁
-              // 改变对应锚点
-              this.$refs.topNavBar.currentIndex = i;
-            }*/
-        // 上面的判断式子过于长，对于我们来说，写的多，而且计算机读的时间也会长，所以采取空间换时间写法
-        //空间换时间   ---  在数组里加入一个最大的值，虽然占空间，但是读取性能高 在数组里push进去 Number.MAX_VALUE
-        if (this.currentIndex != i && (positionY > this.themeTops[i] && positionY < this.themeTops[parseInt(i) + 1])) {
-          this.currentIndex = i;// 防止赋值过程过于频繁
-          // 改变对应锚点
-          this.$refs.topNavBar.currentIndex = i;
-        }
-      }
-      // 当达到1000时将按钮显示出来,注意，position.y是负数
-      this.listenerBackTopShow(position)
-      //  console.log(position.y)
 
-    },
+    // contentScroll(position) {
+    //   // 获取y值，为了方便我们对比。所以获取正值
+    //   const positionY = -position.y
+    //   // 保存数组长度
+    //   const length = this.themeTops.length - 1;
+    //   // 滚动，这个值与themeTops对比
+    //   for (let i in this.themeTops) {  //获取的i是字符串
+    //     // 这样子3没法获取到
+    //     // if (positionY > this.themeTops[i] && positionY < this.themeTops[parseInt(i)+1]) {
+    //     //   console.log(i)
+    //     // }
+    //     /*if (this.currentIndex != i && ((i < length -1 && positionY > this.themeTops[i] && positionY < this.themeTops[parseInt(i)+1]) ||
+    //         (i == length -1 && positionY > this.themeTops[i]))) {
+    //           this.currentIndex = i;// 防止赋值过程过于频繁
+    //           // 改变对应锚点
+    //           this.$refs.topNavBar.currentIndex = i;
+    //         }*/
+    //     // 上面的判断式子过于长，对于我们来说，写的多，而且计算机读的时间也会长，所以采取空间换时间写法
+    //     //空间换时间   ---  在数组里加入一个最大的值，虽然占空间，但是读取性能高 在数组里push进去 Number.MAX_VALUE
+    //     if (this.currentIndex != i && (positionY > this.themeTops[i] && positionY < this.themeTops[parseInt(i) + 1])) {
+    //       this.currentIndex = i;// 防止赋值过程过于频繁
+    //       // 改变对应锚点
+    //       this.$refs.topNavBar.currentIndex = i;
+    //     }
+    //   }
+    //   // 当达到1000时将按钮显示出来,注意，position.y是负数
+    //   this.listenerBackTopShow(position)
+    //   //  console.log(position.y)
+    // },
+
     // 加入购物车
     addShopCar () {
       // 1、先获取数据
