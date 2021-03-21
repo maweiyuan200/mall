@@ -27,13 +27,13 @@
           ref="Size"></detail-size>
       <!-- 评论区域组件 -->
       <detail-comment-info
-          :commemt-info='commemtInfo'
-          ref="comment"></detail-comment-info>
+          :comment-info='commentInfo'
+          ref="Comment1"></detail-comment-info>
       <!-- 推荐商品数据列表 -->
       <goods-list
           :goods='goodsInfoList'
           :is-detail-msg='isDetailMsg'
-          ref="recommend"
+          ref="Recommend"
           class="goods-list"></goods-list>
     </scroll>
     <!-- .native实现监听组件内原生事件 -->
@@ -105,7 +105,7 @@ export default {
       shopInfo: {},    //店铺信息保存
       goodsInfo: {},   //商品图片等信息
       sizeInfo: {},   // 保存商品尺寸信息
-      commemtInfo: {},   //品论数据保存
+      commentInfo: {},   //品论数据保存
       goodsInfoList: [],  //推荐商品数据
       isDetailMsg: true,  //因为我们推荐数据的组件是用同一个的，所以用来区分数据
       themeTops: [],   //保存头部导航栏对应到的offsetTop值
@@ -137,7 +137,7 @@ export default {
       this.sizeInfo = new SizeInfo(data.itemParams.info,data.itemParams.rule);
       // 7、评论信息
       // 判断是否有评论，因为存在没有评论的情况
-      if (data.rate.cRate !== 0) this.commemtInfo = data.rate;
+      if (data.rate.cRate !== 0) this.commentInfo = data.rate;
       /*this.$nextTick(() => {
          //$nextTick是等该组件创造完后再执行一个回调函数，
          //但是这个只是检测到你dom渲染出来就执行，而图片数据不一定渲染完了，所以高度还是有问题，所以用updated更新
@@ -177,45 +177,31 @@ export default {
       // 获取高度，给我们头部导航栏定位锚点用，在这里监听是最好的，因为刷新完后，高度获取绝对正确
       this.themeTops.push(0);
       this.themeTops.push(this.$refs.Size.$el.offsetTop);
-      this.themeTops.push(this.$refs.comment.$el.offsetTop);
-      this.themeTops.push(this.$refs.recommend.$el.offsetTop);
+      this.themeTops.push(this.$refs.Comment1.$el.offsetTop);
+      this.themeTops.push(this.$refs.Recommend.$el.offsetTop);
       // 空间换时间,加入最大值
       this.themeTops.push(Number.MAX_VALUE)
-      // console.log(this.themeTops)
     },
     titleClick (index) { //头部导航栏
       this.$refs.scroll.scrollTo(0, -this.themeTops[index], 500)
     },
 
-    // contentScroll(position) {
-    //   // 获取y值，为了方便我们对比。所以获取正值
-    //   const positionY = -position.y
-    //   // 保存数组长度
-    //   const length = this.themeTops.length - 1;
-    //   // 滚动，这个值与themeTops对比
-    //   for (let i in this.themeTops) {  //获取的i是字符串
-    //     // 这样子3没法获取到
-    //     // if (positionY > this.themeTops[i] && positionY < this.themeTops[parseInt(i)+1]) {
-    //     //   console.log(i)
-    //     // }
-    //     /*if (this.currentIndex != i && ((i < length -1 && positionY > this.themeTops[i] && positionY < this.themeTops[parseInt(i)+1]) ||
-    //         (i == length -1 && positionY > this.themeTops[i]))) {
-    //           this.currentIndex = i;// 防止赋值过程过于频繁
-    //           // 改变对应锚点
-    //           this.$refs.topNavBar.currentIndex = i;
-    //         }*/
-    //     // 上面的判断式子过于长，对于我们来说，写的多，而且计算机读的时间也会长，所以采取空间换时间写法
-    //     //空间换时间   ---  在数组里加入一个最大的值，虽然占空间，但是读取性能高 在数组里push进去 Number.MAX_VALUE
-    //     if (this.currentIndex != i && (positionY > this.themeTops[i] && positionY < this.themeTops[parseInt(i) + 1])) {
-    //       this.currentIndex = i;// 防止赋值过程过于频繁
-    //       // 改变对应锚点
-    //       this.$refs.topNavBar.currentIndex = i;
-    //     }
-    //   }
-    //   // 当达到1000时将按钮显示出来,注意，position.y是负数
-    //   this.listenerBackTopShow(position)
-    //   //  console.log(position.y)
-    // },
+    contentScroll(position) {
+      // 获取y值，为了方便我们对比。所以获取正值
+      const positionY = -position.y
+      // 保存数组长度
+      let length = this.themeTops.length;
+      // 滚动，这个值与themeTops对比
+      for (let i = 0; i < length - 1; i ++) {  //获取的i是字符串
+        if (this.currentIndex !== i && (positionY >= this.themeTops[i] && positionY < this.themeTops[i + 1])) {
+          this.currentIndex = i;// 防止赋值过程过于频繁
+          this.$refs.topNavBar.currentIndex = this.currentIndex;
+        }
+      }
+      // 当达到1000时将按钮显示出来,注意，position.y是负数
+      this.listenerBackTopShow(position)
+      //  console.log(position.y)
+    },
 
     // 加入购物车
     addShopCar () {

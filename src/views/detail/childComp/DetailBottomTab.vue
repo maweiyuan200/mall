@@ -57,7 +57,6 @@ export default {
     z-index: 102;
     font-size: 12px;
     text-align: center;
-    border-top: 1px solid #999;
   }
   .left {
     display: flex;
@@ -92,7 +91,7 @@ export default {
     color: #ffffff;
   }
   .btn1 {
-    border-radius: 20px 0 0 20px;   /*其值为高度的一半*/ 
+    border-radius: 20px 0 0 20px;   /*其值为高度的一半*/
     background: linear-gradient(90deg,#ffd01e,#ff8917)
 
   }

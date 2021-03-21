@@ -1,5 +1,5 @@
 <template>
-  <div id="commentInfo" v-if="Object.keys(commemtInfo).length !== 0">
+  <div id="commentInfo" v-if="Object.keys(commentInfo).length !== 0">
     <!-- 评论头部模块 -->
     <div class="comment-head">
       <span>用户评价</span>
@@ -10,18 +10,18 @@
       <!-- 用户信息 -->
         <div class="user-info">
           <span class="user-logo">
-            <img :src="commemtInfo.list[0].user.avatar" />
+            <img :src="commentInfo.list[0].user.avatar" />
           </span>
-          <span>{{commemtInfo.list[0].user.uname}}</span>
+          <span>{{commentInfo.list[0].user.uname}}</span>
         </div>
         <!-- 用户评论 -->
         <div class='user-essay'>
-          {{commemtInfo.list[0].content}}
+          {{commentInfo.list[0].content}}
         </div>
         <!-- 评论时间等其它细节 -->
         <div class='other-info'>
-          <span>{{commemtInfo.list[0].created | getData}}</span>
-          <span class="style">{{ commemtInfo.list[0].style }}</span>
+          <span>{{commentInfo.list[0].created | getData}}</span>
+          <span class="style">{{ commentInfo.list[0].style }}</span>
         </div>
     </div>
   </div>
@@ -33,7 +33,7 @@
 export default {
   name: 'DetailCommentInfo',
   props: {
-    commemtInfo: {
+    commentInfo: {
       type: Object,
       default() {
         return {}

@@ -46,10 +46,10 @@ export const MixIn = {
         //判断y轴实时位置决定是否显示返回顶部按钮
         this.isShowBackTop = -(position.y) > 1000
       },
-      // listenerBackTopShow (position) {
-      //    // 当达到1000时将按钮显示出来,注意，position.y是负数
-      //    this.isShowBackTop = -(position.y) > 1000
-      // }
+      listenerBackTopShow (position) {
+         // 当达到1000时将按钮显示出来,注意，position.y是负数
+         this.isShowBackTop = -(position.y) > 1000
+      }
     }
   }
 
